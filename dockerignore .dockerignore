@@ -1,0 +1,54 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosettings
+
+# Test results
+**/TestResults/
+**/coverage/
+**/*.trx
+
+# NuGet
+**/packages/
+*.nupkg
+*.snupkg
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*
+
+# Documentation
+*.md
+!README.md
+
+# Environment
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github/

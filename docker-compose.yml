@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fiapx-usuario-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_fiap_2026
+      MYSQL_DATABASE: fiap_usuarios
+      MYSQL_USER: user_fiap
+      MYSQL_PASSWORD: pass_fiap
+    ports:
+      - "3336:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - fiapx-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_fiap_2026"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  usuario-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fiapx-usuario-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=fiap_usuarios;Uid=user_fiap;Pwd=pass_fiap;
+      - Jwt__Key=mySuperSecretKey123!@#2026fiapSoat11Usuario
+      - Jwt__Issuer=fiapx_usuario_service
+      - Jwt__Audience=fiapx_usuario_client
+      - Jwt__ExpirationInMinutes=60
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - fiapx-network
+
+networks:
+  fiapx-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
