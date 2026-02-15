@@ -84,7 +84,7 @@ namespace Application.Tests.UseCases
             {
                 Password = "123teste",
                 Nome = "João da Silva",
-                Email = "joao.silva@email.com",
+                Email = "joao@email.com",
                 CreatedAt = usuarioOriginal.CreatedAt,
                 UpdatedAt = usuarioOriginal.UpdatedAt.AddMinutes(10),
             };
@@ -92,7 +92,7 @@ namespace Application.Tests.UseCases
             var result = await _usuarioUseCase.AtualizarUsuario(usuarioOriginal, usuarioAtualizado);
 
             Assert.AreEqual(usuarioAtualizado.Nome, result.Nome);
-            Assert.AreEqual(usuarioAtualizado.Email, result.Email);
+            Assert.AreEqual(usuarioOriginal.Email, result.Email);
         }
 
         [TestMethod]
@@ -107,8 +107,8 @@ namespace Application.Tests.UseCases
         [ExpectedException(typeof(ArgumentException))]
         public async Task AtualizarUsuario_PasswordDifferent_ThrowsException()
         {
-            var usuarioOriginal = new Usuario { Password = "123teste", };
-            var usuarioNovo = new Usuario { Password = "321Teste", };
+            var usuarioOriginal = new Usuario { Password = "123teste", Email = "teste@email.com" };
+            var usuarioNovo = new Usuario { Password = "321Teste", Email = "outro@email.com" };
 
             await _usuarioUseCase.AtualizarUsuario(usuarioOriginal, usuarioNovo);
         }
