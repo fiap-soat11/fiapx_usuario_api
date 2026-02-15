@@ -12,6 +12,7 @@ on:
 jobs:
   continuous-integration:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,29 +73,32 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory:"${{ runner.temp }}/TestResults"
 
-      - name: Build and analyze with SonarQube
+      - name: Build and analyze with SonarQube Cloud
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USUARIO}}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USUARIO }}
         run: |
           ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
             /k:"fiap-soat11_fiapx_usuario_api" \
             /o:"fiap-soat11" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}" \
+            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="${{ runner.temp }}/TestResults/**/coverage.cobertura.xml" \
+            /d:sonar.cs.cobertura.reportsPaths="${{ runner.temp }}/TestResults/**/coverage.cobertura.xml" \
             /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/Startup.cs,**/obj/**,**/bin/**,**/*Validator.cs"
-          
+
           dotnet build --configuration Release --no-restore
-          
-          ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}"
+
+          ${{ runner.temp }}/scanner/dotnet-sonarscanner end \
+            /d:sonar.token="$SONAR_TOKEN"
 
   continuous-delivery:
     runs-on: ubuntu-latest
     needs: continuous-integration
     if: github.ref == 'refs/heads/main'
+
     env:
       ECR_REPO_NAME: 'fiapx-usuario-api'
       IMAGE_TAG: 'latest'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
