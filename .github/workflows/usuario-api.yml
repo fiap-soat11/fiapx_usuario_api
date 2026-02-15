@@ -65,30 +65,27 @@ jobs:
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run tests with coverage
-        run: |
-          dotnet test --configuration Release \
-            --no-restore \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            --results-directory:"${{ runner.temp }}/TestResults"
+     - name: Build and analyze with SonarQube
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USUARIO }}
+  run: |
+    ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
+      /k:"fiap-soat11_fiapx_usuario_api" \
+      /o:"fiap-soat11" \
+      /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}" \
+      /d:sonar.host.url="https://sonarcloud.io" \
+      /d:sonar.cs.opencover.reportsPaths="${{ runner.temp }}/TestResults/**/coverage.cobertura.xml" \
+      /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/Startup.cs,**/obj/**,**/bin/**,**/*Validator.cs"
 
-      - name: Build and analyze with SonarQube Cloud
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USUARIO }}
-        run: |
-          ${{ runner.temp }}/scanner/dotnet-sonarscanner begin \
-            /k:"fiap-soat11_fiapx_usuario_api" \
-            /o:"fiap-soat11" \
-            /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.cobertura.reportsPaths="${{ runner.temp }}/TestResults/**/coverage.cobertura.xml" \
-            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/Startup.cs,**/obj/**,**/bin/**,**/*Validator.cs"
+    dotnet build --configuration Release --no-restore
 
-          dotnet build --configuration Release --no-restore
+    dotnet test --configuration Release \
+      --no-restore \
+      --collect:"XPlat Code Coverage" \
+      --results-directory:"${{ runner.temp }}/TestResults"
 
-          ${{ runner.temp }}/scanner/dotnet-sonarscanner end \
-            /d:sonar.token="$SONAR_TOKEN"
+    ${{ runner.temp }}/scanner/dotnet-sonarscanner end \
+      /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}"
 
   continuous-delivery:
     runs-on: ubuntu-latest
