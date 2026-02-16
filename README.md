@@ -192,9 +192,29 @@ dotnet test
 
 ---
 
-## CI/CD
+## 🔄 CI/CD
 
 O deploy é feito automaticamente através do GitHub Actions ao subir alterações na branch `main`. A imagem é criada e enviada para o AWS ECR.
+
+### Pipeline de Integração Contínua
+
+O pipeline executa as seguintes etapas:
+
+1. **Build**: Compilação do projeto .NET 8
+2. **Testes**: Execução dos testes unitários com cobertura de código
+3. **SonarCloud**: Análise de qualidade de código e segurança
+4. **Deploy** (apenas na `main`): Build e push da imagem Docker para AWS ECR
+
+### Cobertura de Código
+
+A cobertura de código é coletada automaticamente durante a execução dos testes e enviada para o SonarCloud. O projeto requer:
+
+- **Mínimo de 80% de cobertura** em novas linhas de código
+- **Rating A** para Reliability e Security
+
+### Pull Requests
+
+Para Pull Requests, o SonarCloud analisa apenas o código novo/modificado e exibe o resultado diretamente no PR.
 
 ---
 

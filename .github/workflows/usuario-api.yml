@@ -53,8 +53,11 @@ jobs:
             /o:"fiap-soat11" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.cobertura.reportsPaths="**/coverage.cobertura.xml" \
-            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/Startup.cs,**/obj/**,**/bin/**,**/*Validator.cs"
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.cobertura.xml" \
+            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/Startup.cs,**/obj/**,**/bin/**,**/*Validator.cs" \
+            ${{ github.event_name == 'pull_request' && format('/d:sonar.pullrequest.key={0}', github.event.pull_request.number) || '' }} \
+            ${{ github.event_name == 'pull_request' && format('/d:sonar.pullrequest.branch={0}', github.event.pull_request.head.ref) || '' }} \
+            ${{ github.event_name == 'pull_request' && format('/d:sonar.pullrequest.base={0}', github.event.pull_request.base.ref) || '' }}
 
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
@@ -64,7 +67,12 @@ jobs:
           dotnet test \
             --configuration Release \
             --no-build \
-            --collect:"XPlat Code Coverage"
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+      - name: List Coverage Files (Debug)
+        run: find . -name "coverage.cobertura.xml" -type f
 
       - name: End SonarCloud Analysis
         env:
