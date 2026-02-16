@@ -1,5 +1,4 @@
 name: Compilar e Enviar para ECR Usuario API
-
 on:
     push:
         branches: 
@@ -48,19 +47,13 @@ jobs:
           - name: Restore dependencies
             run: dotnet restore
             
-          - name: Build solution
-            run: dotnet build --configuration Release --no-restore
-            
-          - name: Run tests and collect coverage
-            run: |
-              dotnet test ./Application.Test/Application.Test.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --logger trx --results-directory ./TestResults
-              
           - name: Build and analyze with SonarQube
             env:
               SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USUARIO }}
             run: |
-              ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"fiap-soat11_fiapx_usuario_api" /o:"fiap-soat11" /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.cobertura.xml" /d:sonar.coverage.exclusions="**/Program.cs,**/Migrations/**,**/*Response.cs,**/*Request.cs,**/obj/**,**/bin/**"
+              ${{ runner.temp }}/scanner/dotnet-sonarscanner begin /k:"fiap-soat11_fiapx_usuario_api" /o:"fiap-soat11" /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" /d:sonar.coverage.exclusions="**/Program.cs,**/Migrations/**,**/*Response.cs,**/*Request.cs,**/obj/**,**/bin/**"
               dotnet build --configuration Release --no-restore
+              dotnet test ./Application.Test/Application.Test.csproj --configuration Release --no-build --collect:"XPlat Code Coverage" --settings:./Application.Test/test.runsettings --logger trx --results-directory ./TestResults
               ${{ runner.temp }}/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN_USUARIO }}"
               
           - name: Upload test results
@@ -75,7 +68,7 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: coverage-reports
-              path: TestResults/**/coverage.cobertura.xml
+              path: TestResults/**/coverage.opencover.xml
 
     continuous-delivery:
         runs-on: ubuntu-latest
