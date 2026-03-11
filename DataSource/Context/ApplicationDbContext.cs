@@ -26,7 +26,7 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Usuario");
+            entity.ToTable("users");
 
             entity.Property(e => e.Password)
                 .HasMaxLength(8)
