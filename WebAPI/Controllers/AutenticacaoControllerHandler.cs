@@ -25,6 +25,7 @@ public class AutenticacaoControllerHandler : ControllerBase
     }
 
 
+    [AllowAnonymous]
     [HttpPost(Name = "GerarToken")]
     [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
