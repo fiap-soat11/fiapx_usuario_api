@@ -23,13 +23,17 @@ namespace Application.UseCases
         /// <summary>
         /// Gera um token JWT para o usuário autenticado
         /// </summary>
+        /// <param name="userId">ID do usuário no banco</param>
         /// <param name="email">Email do usuário</param>
         /// <param name="senha">Senha do usuário (não é armazenada no token)</param>
         /// <returns>Token JWT em formato string</returns>
         /// <exception cref="ArgumentException">Quando email ou senha são inválidos</exception>
-        public async Task<string> GerarToken(string email, string senha)
+        public async Task<string> GerarToken(int userId, string email, string senha)
         {
             // Validação de entrada
+            if (userId <= 0)
+                throw new ArgumentException("UserId é obrigatório", nameof(userId));
+
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email é obrigatório", nameof(email));
 
@@ -43,6 +47,8 @@ namespace Application.UseCases
             // Definir claims do token
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim("user_id", userId.ToString()),
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Name, email),
                 new Claim(JwtRegisteredClaimNames.Sub, email),

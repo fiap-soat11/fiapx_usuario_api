@@ -5,6 +5,7 @@ using Application.Configurations;
 using Application.Interfaces;
 using Application.UseCases;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,17 +20,20 @@ namespace Adapters.Controllers
         private readonly IAutenticacaoUseCase _autenticacaoUseCase;
         private readonly IUsuarioGateway _usuarioGateway;
         private readonly IUsuarioUseCase _usuarioUseCase;
+        private readonly JwtSettings _jwtSettings;
 
         public AutenticacaoController(
             ILogger<AutenticacaoController> logger,
             IAutenticacaoUseCase autenticacaoUseCase,
             IUsuarioGateway usuarioGateway,
-            IUsuarioUseCase usuarioUseCase)
+            IUsuarioUseCase usuarioUseCase,
+            IOptions<JwtSettings> jwtSettings)
         {
             _logger = logger;
             _autenticacaoUseCase = autenticacaoUseCase;
             _usuarioGateway = usuarioGateway;
             _usuarioUseCase = usuarioUseCase;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<AutenticacaoResponse> GerarToken(AutenticacaoRequest autenticacao)
@@ -50,13 +54,14 @@ namespace Adapters.Controllers
                     throw new BusinessException("Email ou senha inválidos");
                 }
 
-                var token = await _autenticacaoUseCase.GerarToken(usuario.Email, usuario.Password);
+                var token = await _autenticacaoUseCase.GerarToken(usuario.Id, usuario.Email, usuario.Password);
 
                 var response = new AutenticacaoResponse
                 {
+                    UserId = usuario.Id,
                     Token = token,
                     TokenType = "Bearer",
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(60),
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes),
                     Email = usuario.Email,
                     Nome = usuario.Nome
                 };
