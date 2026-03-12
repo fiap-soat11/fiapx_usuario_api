@@ -1,16 +1,16 @@
 USE fiap_usuarios;
 
-CREATE TABLE IF NOT EXISTS Usuarios (
+CREATE TABLE IF NOT EXISTS users (
     Id INT AUTO_INCREMENT PRIMARY KEY,
-    Nome VARCHAR(255) NOT NULL,
-    Email VARCHAR(255) NOT NULL UNIQUE,
-    Password VARCHAR(255) NOT NULL,
-    CreatedAt DATETIME NOT NULL,
-    UpdatedAt DATETIME NOT NULL,
-    INDEX idx_email (Email)
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO Usuarios (Nome, Email, Password, CreatedAt, UpdatedAt) VALUES
+INSERT INTO users (nome, email, password_hash, created_at, updated_at) VALUES
 ('Admin User', 'admin@teste.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMeStkKEA.Z6.y8B8W5hN6Rj3C', UTC_TIMESTAMP(), UTC_TIMESTAMP()),
 ('João Silva', 'joao.silva@teste.com', '$2a$12$rQv3c1yqBWVHxkd0LHAkCOYz6TtxMeStkKEA.Z6.y8B8W5hN6Rj3D', UTC_TIMESTAMP(), UTC_TIMESTAMP()),
 ('Maria Santos', 'maria.santos@teste.com', '$2a$12$sQv3c1yqBWVHxkd0LHAkCOYz6TtxMeStkKEA.Z6.y8B8W5hN6Rj3E', UTC_TIMESTAMP(), UTC_TIMESTAMP()),

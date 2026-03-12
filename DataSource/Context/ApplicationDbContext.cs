@@ -31,13 +31,17 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(8)
                 .IsFixedLength()
-                .HasColumnName("password");
+                .HasColumnName("password_hash");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
             entity.Property(e => e.Nome)
                 .HasMaxLength(100)
-                .HasColumnName("nome");
+                .HasColumnName("name");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
         });
 
         OnModelCreatingPartial(modelBuilder);
