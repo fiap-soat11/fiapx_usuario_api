@@ -8,6 +8,6 @@ namespace Application.Interfaces
 {
     public interface IAutenticacaoUseCase
     {
-        Task<string> GerarToken(string email, string senha);
+        Task<string> GerarToken(int userId, string email, string senha);
     }
 }
